@@ -2,18 +2,69 @@ import subprocess
 import re
 import pickle
 import os
+import psycopg2
+from dotenv import load_dotenv
+
+load_dotenv()
+
+host = "localhost"
+database = os.getenv("SQL_DATABASE")
+user = os.getenv("SQL_USER")
+password = os.getenv("SQL_PASSWORD")
+
+connection = psycopg2.connect(
+    host=host,
+    database=database,
+    user=user,
+    password=password,
+)
+
+cursor = connection.cursor()
+
+
+def run_query():
+    query = """
+    SELECT * FROM new_schema.test
+    """
+    try:
+        cursor.execute(query)
+        records = cursor.fetchall()
+
+        print("Records from the table")
+        for row in records:
+            print(row)
+    except Exception as e:
+        print(f"Error during retrieval: {e}")
+
+
+def insert_query():
+    query = """
+    INSERT INTO new_schema.test (id, name) VALUES (%s, %s)
+    """
+    data_to_insert = (3, "Third")
+
+    try:
+        cursor.execute(query, data_to_insert)
+        connection.commit()
+        print("Record inserted successfully")
+    except Exception as e:
+        print(f"Error: {e}")
+        connection.rollback()
+
 
 def load_seen_ips(file_path):
     """Load the set of seen IPs from a file."""
     if os.path.exists(file_path):
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             return pickle.load(f)
     return set()  # Return an empty set if the file doesn't exist
 
+
 def save_seen_ips(file_path, seen_ips):
     """Save the set of seen IPs to a file."""
-    with open(file_path, 'wb') as f:
+    with open(file_path, "wb") as f:
         pickle.dump(seen_ips, f)
+
 
 def get_coordinates(ip):
     """Fetch latitude and longitude for the given IP address using GeoIP service."""
@@ -26,14 +77,20 @@ def get_coordinates(ip):
         print(f"Error fetching coordinates for {ip}: {e}")
         return None
 
+
 def tail_f(file_path, seen_ips_file):
-    process = subprocess.Popen(['tail', '-f', '-n', '-0', file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    process = subprocess.Popen(
+        ["tail", "-f", "-n", "-0", file_path],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
 
     # Regular expression pattern for extracting fields from Nginx access log
     log_pattern = re.compile(
-        r'(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] '
+        r"(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "
         r'"(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" '
-        r'(?P<status_code>\d+) (?P<response_size>\d+) '
+        r"(?P<status_code>\d+) (?P<response_size>\d+) "
         r'"(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
     )
 
@@ -46,14 +103,14 @@ def tail_f(file_path, seen_ips_file):
                 line = line.strip()
                 match = log_pattern.search(line)
                 if match:
-                    ip = match.group('ip')
-                    timestamp = match.group('timestamp')
-                    method = match.group('method')
-                    url = match.group('url')
-                    status_code = match.group('status_code')
-                    response_size = match.group('response_size')
-                    referrer = match.group('referrer')
-                    user_agent = match.group('user_agent')
+                    ip = match.group("ip")
+                    timestamp = match.group("timestamp")
+                    method = match.group("method")
+                    url = match.group("url")
+                    status_code = match.group("status_code")
+                    response_size = match.group("response_size")
+                    referrer = match.group("referrer")
+                    user_agent = match.group("user_agent")
 
                     # Check if the IP address has been seen before
                     if ip in seen_ips:
@@ -61,9 +118,11 @@ def tail_f(file_path, seen_ips_file):
                     else:
                         # Add the IP to the set
                         seen_ips.add(ip)
-                        print(f"New IP: {ip}, Timestamp: {timestamp}, Method: {method}, URL: {url}, "
-                              f"Status Code: {status_code}, Response Size: {response_size}, "
-                              f"Referrer: {referrer}, User Agent: {user_agent}")
+                        print(
+                            f"New IP: {ip}, Timestamp: {timestamp}, Method: {method}, URL: {url}, "
+                            f"Status Code: {status_code}, Response Size: {response_size}, "
+                            f"Referrer: {referrer}, User Agent: {user_agent}"
+                        )
                         coordinates = get_coordinates(ip)
                         if coordinates:
                             print(f"Coordinates for {ip}: {coordinates}")
@@ -76,7 +135,9 @@ def tail_f(file_path, seen_ips_file):
         process.wait()
         save_seen_ips(seen_ips_file, seen_ips)  # Save seen IPs before exiting
 
-if __name__ == "__main__":
-    seen_ips_file = 'seen_ips.pkl'  # File to save the set of seen IPs
-    tail_f('/var/log/nginx/access.log', seen_ips_file)
 
+if __name__ == "__main__":
+    run_query()
+    # insert_query()
+    seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
+    tail_f("/var/log/nginx/access.log", seen_ips_file)
