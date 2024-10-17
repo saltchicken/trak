@@ -72,10 +72,10 @@ def get_coordinates(ip):
         # Run curl command to get geo information
         command = f"curl -s https://json.geoiplookup.io/{ip} | jq -r '[.latitude, .longitude] | @csv'"
         result = subprocess.check_output(command, shell=True, text=True)
-        return result.strip()  # Return the result as a string
+        return result.strip().split(",")  # Return the result as a string
     except subprocess.CalledProcessError as e:
         print(f"Error fetching coordinates for {ip}: {e}")
-        return None
+        return None, None
 
 
 def tail_f(file_path, seen_ips_file):
@@ -123,9 +123,12 @@ def tail_f(file_path, seen_ips_file):
                             f"Status Code: {status_code}, Response Size: {response_size}, "
                             f"Referrer: {referrer}, User Agent: {user_agent}"
                         )
-                        coordinates = get_coordinates(ip)
-                        if coordinates:
-                            print(f"Coordinates for {ip}: {coordinates}")
+                        latitude, longitude = get_coordinates(ip)
+                        if latitude and longitude:
+                            # print(f"Coordinates for {ip}: {coordinates}")
+                            print(ip)
+                            print(latitude)
+                            print(longitude)
             else:
                 break
     except KeyboardInterrupt:
