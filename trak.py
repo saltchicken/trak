@@ -24,7 +24,7 @@ cursor = connection.cursor()
 
 def run_query():
     query = """
-    SELECT * FROM new_schema.test
+    SELECT * FROM trak_dev.connections
     """
     try:
         cursor.execute(query)
@@ -37,11 +37,11 @@ def run_query():
         print(f"Error during retrieval: {e}")
 
 
-def insert_query():
+def insert_connection(ip, latitude, longitude):
     query = """
-    INSERT INTO new_schema.test (id, name) VALUES (%s, %s)
+    INSERT INTO trak_dev.connections (ip, latitude, longitude) VALUES (%s, %s, %s)
     """
-    data_to_insert = (3, "Third")
+    data_to_insert = (ip, latitude, longitude)
 
     try:
         cursor.execute(query, data_to_insert)
@@ -125,10 +125,11 @@ def tail_f(file_path, seen_ips_file):
                         )
                         latitude, longitude = get_coordinates(ip)
                         if latitude and longitude:
+                            insert_connection(ip, latitude, longitude)
                             # print(f"Coordinates for {ip}: {coordinates}")
-                            print(ip)
-                            print(latitude)
-                            print(longitude)
+                            # print(ip)
+                            # print(latitude)
+                            # print(longitude)
             else:
                 break
     except KeyboardInterrupt:
