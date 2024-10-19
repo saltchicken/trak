@@ -1,3 +1,4 @@
 .env
 venv
 seen_ips.pkl
+__pycache__
