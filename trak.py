@@ -2,7 +2,7 @@ import subprocess
 import re
 import pickle
 import os
-import shlex
+import argparse
 import pandas as pd
 from utils import SQL_Cursor
 
@@ -90,26 +90,6 @@ def parse_line(line):
         return None
 
 
-# def parse_line_shlex(line):
-#     try:
-#         line = re.sub(r"[\[\]]", "", line)
-#         log_parts = shlex.split(line)
-#         ip = log_parts[0]
-#         timestamp = log_parts[3].strip("[]") + " " + log_parts[4].strip("[]")
-#         method, url, http_version = log_parts[5].strip('"').split(" ")
-#         status_code = log_parts[6]
-#         response_size = log_parts[7]
-#         referrer = log_parts[8]
-#         user_agent = log_parts[9]
-#         connection = Connection(
-#             ip, timestamp, method, url, status_code, response_size, referrer, user_agent
-#         )
-#         return connection
-#     except Exception as e:
-#         print("ERROR: Unable to parse connection.   ", e)
-#         return None
-
-
 def tail_f(file_path, seen_ips_file):
     process = subprocess.Popen(
         ["tail", "-f", "-n", "-0", file_path],
@@ -167,7 +147,6 @@ def log_parser():
                 print("ERROR: Unable to parse log line properly. Skipping")
 
     logs_df = pd.DataFrame(log_entries)
-    print(logs_df.head())  # TODO: Delete this
     return logs_df
 
 
@@ -175,6 +154,26 @@ if __name__ == "__main__":
     # sql_cursor.run_query()
     # insert_query()
     #
-    # seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
-    # tail_f("/var/log/nginx/access.log", seen_ips_file)
-    log_parser()
+    # log_parser()
+    arg_parser = argparse.ArgumentParser(
+        description="Process log files from nginx access log"
+    )
+    arg_parser.add_argument("--realtime", action="store_true", help="Run with tail -f")
+    arg_parser.add_argument(
+        "--print",
+        choices=["all", "unique_ips"],
+        required=True,
+        help="Choose which data to print: all, unique_ips",
+    )
+
+    args = arg_parser.parse_args()
+
+    if args.realtime:
+        seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
+        tail_f("/var/log/nginx/access.log", seen_ips_file)
+    else:
+        logs_df = log_parser()
+        if args.print == "all":
+            print(logs_df)
+        elif args.print == "unique_ips":
+            print(logs_df["ip"].unique())
