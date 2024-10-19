@@ -126,6 +126,7 @@ def tail_f(file_path, seen_ips_file):
         while True:
             line = process.stdout.readline()
             if line:
+                line = re.sub(r"[\[\]]", "", line)
                 connection = parse_line(line)
                 if connection:
                     # Check if the IP address has been seen before
