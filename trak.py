@@ -160,8 +160,8 @@ if __name__ == "__main__":
     arg_parser.add_argument("--realtime", action="store_true", help="Run with tail -f")
     arg_parser.add_argument(
         "--print",
-        choices=["all", "unique_ips"],
-        help="Choose which data to print: all, unique_ips",
+        choices=["all", "unique_ips", "status_code"],
+        help="Choose which data to print: all, unique_ips, status_code",
     )
 
     args = arg_parser.parse_args()
@@ -176,5 +176,7 @@ if __name__ == "__main__":
                 print(logs_df)
             elif args.print == "unique_ips":
                 print(logs_df["ip"].unique())
+            elif args.print == "status_code":
+                print(logs_df["status_code"])
         else:
             print("Argument for --print is required for non-realtime analysis")
