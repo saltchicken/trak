@@ -5,7 +5,7 @@ import os
 import pandas as pd
 from utils import SQL_Cursor
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 
 @dataclass
@@ -134,7 +134,14 @@ def log_parser():
     log_file = "/var/log/nginx/access.log"
 
     with open(log_file, "r") as f:
-        log_entries = [parse_line(line) for line in f]
+        log_entries = []
+        for line in f:
+            connection = parse_line(line)
+            if connection:
+                log_entries.append(asdict(connection))
+            else:
+                print("ERROR: Unable to parse log line properly. Skipping")
+
     logs_df = pd.DataFrame(log_entries)
     print(logs_df.head())  # TODO: Delete this
     return logs_df
