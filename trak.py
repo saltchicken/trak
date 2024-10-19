@@ -170,8 +170,8 @@ if __name__ == "__main__":
         seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
         tail_f("/var/log/nginx/access.log", seen_ips_file)
     else:
-        logs_df = log_parser()
         if args.print:
+            logs_df = log_parser()
             if args.print == "all":
                 print(logs_df)
             elif args.print == "unique_ips":
