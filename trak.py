@@ -163,6 +163,7 @@ if __name__ == "__main__":
         choices=["all", "unique_ips", "status_code"],
         help="Choose which data to print: all, unique_ips, status_code",
     )
+    arg_parser.add_argument("--code", help="Specific status_code")
 
     args = arg_parser.parse_args()
 
@@ -177,6 +178,9 @@ if __name__ == "__main__":
             elif args.print == "unique_ips":
                 print(logs_df["ip"].unique())
             elif args.print == "status_code":
-                print(logs_df["status_code"])
+                if args.code:
+                    print(logs_df["status_code"] == args.code)
+                else:
+                    print(logs_df["status_code"])
         else:
             print("Argument for --print is required for non-realtime analysis")
