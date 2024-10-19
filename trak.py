@@ -161,7 +161,6 @@ if __name__ == "__main__":
     arg_parser.add_argument(
         "--print",
         choices=["all", "unique_ips"],
-        required=True,
         help="Choose which data to print: all, unique_ips",
     )
 
@@ -172,7 +171,10 @@ if __name__ == "__main__":
         tail_f("/var/log/nginx/access.log", seen_ips_file)
     else:
         logs_df = log_parser()
-        if args.print == "all":
-            print(logs_df)
-        elif args.print == "unique_ips":
-            print(logs_df["ip"].unique())
+        if args.print:
+            if args.print == "all":
+                print(logs_df)
+            elif args.print == "unique_ips":
+                print(logs_df["ip"].unique())
+        else:
+            print("Argument for --print is required for non-realtime analysis")
