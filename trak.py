@@ -179,7 +179,7 @@ if __name__ == "__main__":
                 print(logs_df["ip"].unique())
             elif args.print == "status_code":
                 if args.code:
-                    print(logs_df.loc[["status_code"] == args.code])
+                    print(logs_df.loc[logs_df["status_code"] == args.code])
                 else:
                     print(logs_df["status_code"])
         else:
