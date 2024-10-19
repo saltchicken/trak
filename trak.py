@@ -84,6 +84,7 @@ def parse_line(line):
         )
         return connection
     else:
+        print(line)
         print("ERROR: Parse line did not find match")
         return None
 
