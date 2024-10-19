@@ -4,6 +4,33 @@ import pickle
 import os
 from utils import SQL_Cursor
 
+from dataclasses import dataclass
+
+
+@dataclass
+class Connection:
+    ip: str
+    timestamp: str
+    method: str
+    url: str
+    status_code: str
+    response_size: str
+    referrer: str
+    user_agent: str
+
+    def __str__(self):
+        return f"""
+        New IP: {self.ip}
+        Timestamp: {self.timestamp}
+        Method: {self.method}
+        URL: {self.url}
+        Status Code: {self.status_code}
+        Response Size: {self.response_size}
+        Referrer: {self.referrer}
+        User Agent: {self.user_agent}
+        """
+
+
 sql_cursor = SQL_Cursor()
 
 
@@ -33,6 +60,33 @@ def get_coordinates(ip):
         return None, None
 
 
+def parse_line(line):
+    log_pattern = re.compile(
+        r"(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "
+        r'"(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" '
+        r"(?P<status_code>\d+) (?P<response_size>\d+) "
+        r'"(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
+    )
+    line = line.strip()
+    match = log_pattern.search(line)
+    if match:
+        ip = match.group("ip")
+        timestamp = match.group("timestamp")
+        method = match.group("method")
+        url = match.group("url")
+        status_code = match.group("status_code")
+        response_size = match.group("response_size")
+        referrer = match.group("referrer")
+        user_agent = match.group("user_agent")
+        connection = Connection(
+            ip, timestamp, method, url, status_code, response_size, referrer, user_agent
+        )
+        return connection
+    else:
+        print("ERROR: Parse line did not find match")
+        return None
+
+
 def tail_f(file_path, seen_ips_file):
     process = subprocess.Popen(
         ["tail", "-f", "-n", "-0", file_path],
@@ -42,12 +96,6 @@ def tail_f(file_path, seen_ips_file):
     )
 
     # Regular expression pattern for extracting fields from Nginx access log
-    log_pattern = re.compile(
-        r"(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "
-        r'"(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" '
-        r"(?P<status_code>\d+) (?P<response_size>\d+) "
-        r'"(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
-    )
 
     seen_ips = load_seen_ips(seen_ips_file)  # Load previously seen IPs
 
@@ -55,36 +103,22 @@ def tail_f(file_path, seen_ips_file):
         while True:
             line = process.stdout.readline()
             if line:
-                line = line.strip()
-                match = log_pattern.search(line)
-                if match:
-                    ip = match.group("ip")
-                    timestamp = match.group("timestamp")
-                    method = match.group("method")
-                    url = match.group("url")
-                    status_code = match.group("status_code")
-                    response_size = match.group("response_size")
-                    referrer = match.group("referrer")
-                    user_agent = match.group("user_agent")
-
+                connection = parse_line(line)
+                if connection:
                     # Check if the IP address has been seen before
-                    if ip in seen_ips:
-                        print(f"Duplicate IP detected: {ip} at {timestamp}.")
+                    if connection.ip in seen_ips:
+                        print(
+                            f"Duplicate IP detected: {connection.ip} at {connection.timestamp}."
+                        )
                     else:
                         # Add the IP to the set
-                        seen_ips.add(ip)
-                        print(
-                            f"New IP: {ip}, Timestamp: {timestamp}, Method: {method}, URL: {url}, "
-                            f"Status Code: {status_code}, Response Size: {response_size}, "
-                            f"Referrer: {referrer}, User Agent: {user_agent}"
-                        )
-                        latitude, longitude = get_coordinates(ip)
+                        print(connection)
+                        seen_ips.add(connection.ip)
+                        latitude, longitude = get_coordinates(connection.ip)
                         if latitude and longitude:
-                            sql_cursor.insert_connection(ip, latitude, longitude)
-                            # print(f"Coordinates for {ip}: {coordinates}")
-                            # print(ip)
-                            # print(latitude)
-                            # print(longitude)
+                            sql_cursor.insert_connection(
+                                connection.ip, latitude, longitude
+                            )
             else:
                 break
     except KeyboardInterrupt:
@@ -96,7 +130,7 @@ def tail_f(file_path, seen_ips_file):
 
 
 if __name__ == "__main__":
-    sql_cursor.run_query()
+    # sql_cursor.run_query()
     # insert_query()
     seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
     tail_f("/var/log/nginx/access.log", seen_ips_file)
