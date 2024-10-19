@@ -141,6 +141,7 @@ def log_parser():
             if connection:
                 log_entries.append(asdict(connection))
             else:
+                print(line)
                 print("ERROR: Unable to parse log line properly. Skipping")
 
     logs_df = pd.DataFrame(log_entries)
