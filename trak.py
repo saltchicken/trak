@@ -90,24 +90,24 @@ def parse_line(line):
         return None
 
 
-def parse_line_shlex(line):
-    try:
-        line = re.sub(r"[\[\]]", "", line)
-        log_parts = shlex.split(line)
-        ip = log_parts[0]
-        timestamp = log_parts[3].strip("[]") + " " + log_parts[4].strip("[]")
-        method, url, http_version = log_parts[5].strip('"').split(" ")
-        status_code = log_parts[6]
-        response_size = log_parts[7]
-        referrer = log_parts[8]
-        user_agent = log_parts[9]
-        connection = Connection(
-            ip, timestamp, method, url, status_code, response_size, referrer, user_agent
-        )
-        return connection
-    except Exception as e:
-        print("ERROR: Unable to parse connection.   ", e)
-        return None
+# def parse_line_shlex(line):
+#     try:
+#         line = re.sub(r"[\[\]]", "", line)
+#         log_parts = shlex.split(line)
+#         ip = log_parts[0]
+#         timestamp = log_parts[3].strip("[]") + " " + log_parts[4].strip("[]")
+#         method, url, http_version = log_parts[5].strip('"').split(" ")
+#         status_code = log_parts[6]
+#         response_size = log_parts[7]
+#         referrer = log_parts[8]
+#         user_agent = log_parts[9]
+#         connection = Connection(
+#             ip, timestamp, method, url, status_code, response_size, referrer, user_agent
+#         )
+#         return connection
+#     except Exception as e:
+#         print("ERROR: Unable to parse connection.   ", e)
+#         return None
 
 
 def tail_f(file_path, seen_ips_file):
@@ -158,7 +158,7 @@ def log_parser():
     with open(log_file, "r") as f:
         log_entries = []
         for line in f:
-            connection = parse_line_shlex(line)
+            connection = parse_line(line)
             if connection:
                 log_entries.append(asdict(connection))
             else:
