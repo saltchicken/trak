@@ -2,6 +2,7 @@ import subprocess
 import re
 import pickle
 import os
+import pandas as pd
 from utils import SQL_Cursor
 
 from dataclasses import dataclass
@@ -129,8 +130,20 @@ def tail_f(file_path, seen_ips_file):
         save_seen_ips(seen_ips_file, seen_ips)  # Save seen IPs before exiting
 
 
+def log_parser():
+    log_file = "/var/log/nginx/access.log"
+
+    with open(log_file, "r") as f:
+        log_entries = [parse_line(line) for line in f]
+    logs_df = pd.DataFrame(log_entries)
+    print(logs_df.head())  # TODO: Delete this
+    return logs_df
+
+
 if __name__ == "__main__":
     # sql_cursor.run_query()
     # insert_query()
-    seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
-    tail_f("/var/log/nginx/access.log", seen_ips_file)
+    #
+    # seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
+    # tail_f("/var/log/nginx/access.log", seen_ips_file)
+    log_parser()
