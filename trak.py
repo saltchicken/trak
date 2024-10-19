@@ -86,8 +86,8 @@ def parse_line(line):
         return connection
     else:
         print(line)
-        print("ERROR: Parse line did not find match")
         return None
+        print("ERROR: Parse line did not find match")
 
 
 def tail_f(file_path, seen_ips_file):
@@ -106,7 +106,6 @@ def tail_f(file_path, seen_ips_file):
         while True:
             line = process.stdout.readline()
             if line:
-                line = re.sub(r"[\[\]]", "", line)
                 connection = parse_line(line)
                 if connection:
                     # Check if the IP address has been seen before
