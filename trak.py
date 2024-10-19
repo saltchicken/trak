@@ -2,54 +2,9 @@ import subprocess
 import re
 import pickle
 import os
-import psycopg2
-from dotenv import load_dotenv
+from utils import SQL_Cursor
 
-load_dotenv()
-
-host = "localhost"
-database = os.getenv("SQL_DATABASE")
-user = os.getenv("SQL_USER")
-password = os.getenv("SQL_PASSWORD")
-
-connection = psycopg2.connect(
-    host=host,
-    database=database,
-    user=user,
-    password=password,
-)
-
-cursor = connection.cursor()
-
-
-def run_query():
-    query = """
-    SELECT * FROM trak_dev.connections
-    """
-    try:
-        cursor.execute(query)
-        records = cursor.fetchall()
-
-        print("Records from the table")
-        for row in records:
-            print(row)
-    except Exception as e:
-        print(f"Error during retrieval: {e}")
-
-
-def insert_connection(ip, latitude, longitude):
-    query = """
-    INSERT INTO trak_dev.connections (ip, latitude, longitude) VALUES (%s, %s, %s)
-    """
-    data_to_insert = (ip, latitude, longitude)
-
-    try:
-        cursor.execute(query, data_to_insert)
-        connection.commit()
-        print("Record inserted successfully")
-    except Exception as e:
-        print(f"Error: {e}")
-        connection.rollback()
+sql_cursor = SQL_Cursor()
 
 
 def load_seen_ips(file_path):
@@ -125,7 +80,7 @@ def tail_f(file_path, seen_ips_file):
                         )
                         latitude, longitude = get_coordinates(ip)
                         if latitude and longitude:
-                            insert_connection(ip, latitude, longitude)
+                            sql_cursor.insert_connection(ip, latitude, longitude)
                             # print(f"Coordinates for {ip}: {coordinates}")
                             # print(ip)
                             # print(latitude)
@@ -141,7 +96,7 @@ def tail_f(file_path, seen_ips_file):
 
 
 if __name__ == "__main__":
-    run_query()
+    sql_cursor.run_query()
     # insert_query()
     seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
     tail_f("/var/log/nginx/access.log", seen_ips_file)
