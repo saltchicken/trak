@@ -38,7 +38,7 @@ if __name__ == "__main__":
     print(logs_df.head())
 
     # All requests with status code 404
-    logs_df.loc[(logs_df["status code"] == "404")]
+    logs_df.loc[(logs_df["status_code"] == "404")]
 
     # Requests from unique ip addresses
     logs_df["ip"].unique()
