@@ -168,8 +168,8 @@ if __name__ == "__main__":
     args = arg_parser.parse_args()
 
     if args.debug:
-        logger.remove()
-        logger.add(lambda msg: print(msg, end=""), level="DEBUG")
+        logger.add(sys.stdout, level="DEBUG")
+        print("Turning on debug")
 
     if args.realtime:
         seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
