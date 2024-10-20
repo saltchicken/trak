@@ -163,8 +163,13 @@ if __name__ == "__main__":
         help="Choose which data to print: all, unique_ips, status_code",
     )
     arg_parser.add_argument("--code", help="Specific status_code")
+    arg_parser.add_argument("--debug", action="store_true", help="Print debug messages")
 
     args = arg_parser.parse_args()
+
+    if args.debug:
+        logger.remove()
+        logger.add(lambda msg: print(msg, end=""), level="DEBUG")
 
     if args.realtime:
         seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
