@@ -3,6 +3,7 @@ import re
 import pickle
 import os
 import argparse
+from loguru import logger
 import pandas as pd
 from utils import SQL_Cursor
 
@@ -58,7 +59,7 @@ def get_coordinates(ip):
         result = subprocess.check_output(command, shell=True, text=True)
         return result.strip().split(",")  # Return the result as a string
     except subprocess.CalledProcessError as e:
-        print(f"Error fetching coordinates for {ip}: {e}")
+        logger.error(f"Error fetching coordinates for {ip}: {e}")
         return None, None
 
 
@@ -85,9 +86,8 @@ def parse_line(line):
         )
         return connection
     else:
-        print(line)
+        logger.error("Regex parse_line failed")
         return None
-        print("ERROR: Parse line did not find match")
 
 
 def tail_f(file_path, seen_ips_file):
@@ -110,12 +110,12 @@ def tail_f(file_path, seen_ips_file):
                 if connection:
                     # Check if the IP address has been seen before
                     if connection.ip in seen_ips:
-                        print(
+                        logger.info(
                             f"Duplicate IP detected: {connection.ip} at {connection.timestamp}."
                         )
                     else:
                         # Add the IP to the set
-                        print(connection)
+                        logger.debug(connection)
                         seen_ips.add(connection.ip)
                         latitude, longitude = get_coordinates(connection.ip)
                         if latitude and longitude:
@@ -125,7 +125,7 @@ def tail_f(file_path, seen_ips_file):
             else:
                 break
     except KeyboardInterrupt:
-        print("Stopping tail -f.")
+        logger.debug("Stopping tail -f.")
     finally:
         process.terminate()
         process.wait()
@@ -142,8 +142,7 @@ def log_parser():
             if connection:
                 log_entries.append(asdict(connection))
             else:
-                print(line)
-                print("ERROR: Unable to parse log line properly. Skipping")
+                logger.error("Unable to parse log line properly. Skipping")
 
     logs_df = pd.DataFrame(log_entries)
     return logs_df
