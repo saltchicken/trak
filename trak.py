@@ -65,11 +65,14 @@ def get_coordinates(ip):
 
 
 def parse_line(line):
+    # log_pattern = re.compile(
+    #     r"(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "
+    #     r'"(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" '
+    #     r"(?P<status_code>\d+) (?P<response_size>\d+) "
+    #     r'"(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
+    # )
     log_pattern = re.compile(
-        r"(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "
-        r'"(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" '
-        r"(?P<status_code>\d+) (?P<response_size>\d+) "
-        r'"(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
+        r'(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
     )
     line = line.strip()
     match = log_pattern.search(line)
