@@ -102,6 +102,7 @@ def tail_f(file_path, seen_ips_file):
     # Regular expression pattern for extracting fields from Nginx access log
 
     seen_ips = load_seen_ips(seen_ips_file)  # Load previously seen IPs
+    failed_lines = []
 
     try:
         while True:
@@ -123,6 +124,8 @@ def tail_f(file_path, seen_ips_file):
                             sql_cursor.insert_connection(
                                 connection.ip, latitude, longitude
                             )
+                else:
+                    failed_lines.append(line)
             else:
                 break
     except KeyboardInterrupt:
@@ -130,6 +133,9 @@ def tail_f(file_path, seen_ips_file):
     finally:
         process.terminate()
         process.wait()
+        with open("test.txt", "w") as file:
+            for line in failed_lines:
+                file.write(line + "\n")
         save_seen_ips(seen_ips_file, seen_ips)  # Save seen IPs before exiting
 
 
