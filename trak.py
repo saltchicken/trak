@@ -207,9 +207,9 @@ if __name__ == "__main__":
 
     args = arg_parser.parse_args()
 
-    if args.debug:
+    if !args.debug:
         logger.remove()
-        logger.add(sys.stdout, level="DEBUG")
+        logger.add(sys.stdout, level="INFO")
 
     if args.realtime:
         seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
