@@ -91,7 +91,9 @@ def parse_line(line):
         )
         return connection
     else:
-        logger.error("Line did not match valid_request_log_pattern")
+        logger.debug(
+            "Line did not match valid_request_log_pattern. Trying invalid_request_log_pattern"
+        )
         match = invalid_request_log_pattern.search(line)
         if match:
             print("Match invalid_request_log_pattern")
