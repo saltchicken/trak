@@ -89,7 +89,6 @@ def parse_line(line):
         connection = Connection(
             ip, timestamp, method, url, status_code, response_size, referrer, user_agent
         )
-        print(connection)
         return connection
     else:
         logger.error("Line did not match valid_request_log_pattern")
