@@ -96,7 +96,6 @@ def parse_line(line):
         )
         match = invalid_request_log_pattern.search(line)
         if match:
-            print("Match invalid_request_log_pattern")
             ip = match.group("ip")
             timestamp = match.group("timestamp")
             method = ""
