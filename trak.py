@@ -207,7 +207,7 @@ if __name__ == "__main__":
 
     args = arg_parser.parse_args()
 
-    if !args.debug:
+    if not args.debug:
         logger.remove()
         logger.add(sys.stdout, level="INFO")
 
