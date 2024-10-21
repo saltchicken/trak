@@ -166,8 +166,8 @@ def tail_f(file_path, seen_ips_file):
         save_seen_ips(seen_ips_file, seen_ips)  # Save seen IPs before exiting
 
 
-def log_parser():
-    log_file = "/var/log/nginx/access.log"
+def log_parser(log_file_path):
+    log_file = log_file_path
     failed_lines = []
 
     with open(log_file, "r") as f:
@@ -188,10 +188,6 @@ def log_parser():
 
 
 if __name__ == "__main__":
-    # sql_cursor.run_query()
-    # insert_query()
-    #
-    # log_parser()
     arg_parser = argparse.ArgumentParser(
         description="Process log files from nginx access log"
     )
@@ -215,7 +211,7 @@ if __name__ == "__main__":
         tail_f("/var/log/nginx/access.log", seen_ips_file)
     else:
         if args.print:
-            logs_df = log_parser()
+            logs_df = log_parser("/var/log/nginx/access.log")
             if args.print == "all":
                 print(logs_df)
             elif args.print == "unique_ips":
