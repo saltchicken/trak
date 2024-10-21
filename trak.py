@@ -90,6 +90,13 @@ def parse_line(line):
         )
         return connection
     else:
+        log_pattern2 = re.compile(
+            r'(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "(?P<request>[^"]*)" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]*)" "(?P<user_agent>[^"]*)"'
+        )
+        match = log_pattern2.search(line)
+        if match:
+            print("success")
+
         logger.error("Regex parse_line failed")
         return None
 
