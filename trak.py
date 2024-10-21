@@ -180,7 +180,7 @@ def log_parser():
                 logger.error("Unable to parse log line properly. Skipping")
 
     logs_df = pd.DataFrame(log_entries)
-    with open("test.txt", "w") as file:
+    with open("failed_lines.txt", "w") as file:
         for line in failed_lines:
             file.write(line + "\n")
     return logs_df
