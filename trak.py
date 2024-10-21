@@ -118,6 +118,7 @@ def parse_line(line):
             return connection
         else:
             logger.error("Line did not match invalid_request_log_pattern")
+            print(line)
 
             return None
 
