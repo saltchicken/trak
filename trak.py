@@ -21,6 +21,7 @@ class Connection:
     response_size: str
     referrer: str
     user_agent: str
+    request: str = ""
 
     def __str__(self):
         return f"""
@@ -32,6 +33,7 @@ class Connection:
         Response Size: {self.response_size}
         Referrer: {self.referrer}
         User Agent: {self.user_agent}
+        Request: {self.request}
         """
 
 
@@ -64,18 +66,17 @@ def get_coordinates(ip):
         return None, None
 
 
+valid_request_log_pattern = re.compile(
+    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
+)
+invalid_request_log_pattern = re.compile(
+    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "(?P<request>[^"]*)" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]*)" "(?P<user_agent>[^"]*)"'
+)
+
+
 def parse_line(line):
-    # log_pattern = re.compile(
-    #     r"(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "
-    #     r'"(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" '
-    #     r"(?P<status_code>\d+) (?P<response_size>\d+) "
-    #     r'"(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
-    # )
-    log_pattern = re.compile(
-        r'(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
-    )
     line = line.strip()
-    match = log_pattern.search(line)
+    match = valid_request_log_pattern.search(line)
     if match:
         ip = match.group("ip")
         timestamp = match.group("timestamp")
@@ -88,17 +89,38 @@ def parse_line(line):
         connection = Connection(
             ip, timestamp, method, url, status_code, response_size, referrer, user_agent
         )
+        print(connection)
         return connection
     else:
-        log_pattern2 = re.compile(
-            r'(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "(?P<request>[^"]*)" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]*)" "(?P<user_agent>[^"]*)"'
-        )
-        match = log_pattern2.search(line)
+        logger.error("Line did not match valid_request_log_pattern")
+        match = invalid_request_log_pattern.search(line)
         if match:
-            print("success")
+            print("Match invalid_request_log_pattern")
+            ip = match.group("ip")
+            timestamp = match.group("timestamp")
+            method = ""
+            url = ""
+            status_code = ""
+            response_size = match.group("response_size")
+            referrer = match.group("referrer")
+            user_agent = match.group("user_agent")
+            request = match.group("request")
+            connection = Connection(
+                ip,
+                timestamp,
+                method,
+                url,
+                status_code,
+                response_size,
+                referrer,
+                user_agent,
+                request,
+            )
+            return connection
+        else:
+            logger.error("Line did not match invalid_request_log_pattern")
 
-        logger.error("Regex parse_line failed")
-        return None
+            return None
 
 
 def tail_f(file_path, seen_ips_file):
