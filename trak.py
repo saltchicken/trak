@@ -144,6 +144,7 @@ def tail_f(file_path, seen_ips_file):
                 if connection:
                     # Check if the IP address has been seen before
                     if connection.ip in seen_ips:
+                        sql_cursor.check_if_ip_exists(connection.ip)
                         logger.info(
                             f"Duplicate IP detected: {connection.ip} at {connection.timestamp}."
                         )

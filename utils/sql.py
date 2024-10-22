@@ -19,6 +19,18 @@ class SQL_Cursor:
         self.cursor.close()
         self.connection.close()
 
+    def check_if_ip_exists(self, ip):
+        query = f"""
+        SELECT ip FROM {os.getenv("CONNECTIONS_TABLE")}
+        """
+        try:
+            self.cursor.execute(query)
+            records = self.cursor.fetchall()
+            for row in records:
+                print(row, "     ", ip)
+        except Exception as e:
+            print(f"Error during check: {e}")
+
     def run_query(self):
         query = f"""
         SELECT * FROM {os.getenv("CONNECTIONS_TABLE")}
