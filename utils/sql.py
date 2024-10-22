@@ -1,6 +1,19 @@
 import psycopg2
 import os
 from dotenv import load_dotenv
+import ipaddress
+
+
+def check_if_ip_is_LAN(ip):
+    lan_ranges = [
+        ipaddress.ip_network("10.0.0.0/8"),
+        ipaddress.ip_network("172.16.0.0/12"),
+        ipaddress.ip_network("192.168.0.0/16"),
+    ]
+    # Convert IP to IPv4Address object
+    target_ip = ipaddress.ip_address(ip)
+    # Check if the IP is in any of the LAN ranges
+    return any(target_ip in network for network in lan_ranges)
 
 
 class SQL_Cursor:
@@ -20,7 +33,7 @@ class SQL_Cursor:
         self.connection.close()
 
     def check_if_ip_exists(self, ip):
-        if ip == "192.168.1.1" or ip == "10.0.0.1":
+        if check_if_ip_is_LAN(ip):
             print("Coming from home, skipping")
             return True
         query = f"""
