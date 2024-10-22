@@ -20,6 +20,9 @@ class SQL_Cursor:
         self.connection.close()
 
     def check_if_ip_exists(self, ip):
+        if ip == "192.168.1.1":
+            print("Coming from home, skipping")
+            return True
         query = f"""
         SELECT ip FROM {os.getenv("CONNECTIONS_TABLE")} WHERE ip = '{ip}'
         """
