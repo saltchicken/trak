@@ -21,7 +21,7 @@ class SQL_Cursor:
 
     def check_if_ip_exists(self, ip):
         query = f"""
-        SELECT ip FROM {os.getenv("CONNECTIONS_TABLE")}
+        SELECT ip FROM {os.getenv("CONNECTIONS_TABLE")} WHERE ip = {ip}
         """
         try:
             self.cursor.execute(query)
