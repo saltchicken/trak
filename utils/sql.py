@@ -26,8 +26,10 @@ class SQL_Cursor:
         try:
             self.cursor.execute(query)
             records = self.cursor.fetchall()
-            for row in records:
-                print(row, "     ", ip)
+            if len(records):
+                print("ip exists")
+            else:
+                print("ip doesn't exist")
         except Exception as e:
             print(f"Error during check: {e}")
 
