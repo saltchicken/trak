@@ -20,8 +20,8 @@ class SQL_Cursor:
         self.connection.close()
 
     def run_query(self):
-        query = """
-        SELECT * FROM trak_dev.connections
+        query = f"""
+        SELECT * FROM {os.getenv("CONNECTIONS_TABLE")}
         """
         try:
             self.cursor.execute(query)
@@ -34,8 +34,8 @@ class SQL_Cursor:
             print(f"Error during retrieval: {e}")
 
     def insert_connection(self, ip, latitude, longitude):
-        query = """
-        INSERT INTO trak_dev.connections (ip, latitude, longitude) VALUES (%s, %s, %s)
+        query = f"""
+        INSERT INTO {os.getenv("CONNECTIONS_TABLE")} (ip, latitude, longitude) VALUES (%s, %s, %s)
         """
         data_to_insert = (ip, latitude, longitude)
 
