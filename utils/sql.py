@@ -28,10 +28,10 @@ class SQL_Cursor:
             records = self.cursor.fetchall()
             if len(records):
                 print("ip exists")
-                return true
+                return True
             else:
                 print("ip doesn't exist")
-                return false
+                return False
         except Exception as e:
             print(f"Error during check: {e}")
 
