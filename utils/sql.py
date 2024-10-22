@@ -20,7 +20,7 @@ class SQL_Cursor:
         self.connection.close()
 
     def check_if_ip_exists(self, ip):
-        if ip == "192.168.1.1":
+        if ip == "192.168.1.1" or ip == "10.0.0.1":
             print("Coming from home, skipping")
             return True
         query = f"""
