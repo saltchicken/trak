@@ -40,20 +40,6 @@ class Connection:
 sql_cursor = SQL_Cursor()
 
 
-def load_seen_ips(file_path):
-    """Load the set of seen IPs from a file."""
-    if os.path.exists(file_path):
-        with open(file_path, "rb") as f:
-            return pickle.load(f)
-    return set()  # Return an empty set if the file doesn't exist
-
-
-def save_seen_ips(file_path, seen_ips):
-    """Save the set of seen IPs to a file."""
-    with open(file_path, "wb") as f:
-        pickle.dump(seen_ips, f)
-
-
 def get_coordinates(ip):
     """Fetch latitude and longitude for the given IP address using GeoIP service."""
     try:
@@ -124,7 +110,7 @@ def parse_line(line):
             return None
 
 
-def tail_f(file_path, seen_ips_file):
+def tail_f(file_path):
     process = subprocess.Popen(
         ["tail", "-f", "-n", "-0", file_path],
         stdout=subprocess.PIPE,
@@ -134,8 +120,6 @@ def tail_f(file_path, seen_ips_file):
 
     # Regular expression pattern for extracting fields from Nginx access log
 
-    seen_ips = load_seen_ips(seen_ips_file)  # Load previously seen IPs
-
     try:
         while True:
             line = process.stdout.readline()
@@ -143,15 +127,13 @@ def tail_f(file_path, seen_ips_file):
                 connection = parse_line(line)
                 if connection:
                     # Check if the IP address has been seen before
-                    if connection.ip in seen_ips:
-                        sql_cursor.check_if_ip_exists(connection.ip)
+                    if sql_cursor.check_if_ip_exists(connection.ip):
                         logger.info(
                             f"Duplicate IP detected: {connection.ip} at {connection.timestamp}."
                         )
                     else:
                         # Add the IP to the set
                         logger.debug(connection)
-                        seen_ips.add(connection.ip)
                         latitude, longitude = get_coordinates(connection.ip)
                         if latitude and longitude:
                             sql_cursor.insert_connection(
@@ -164,7 +146,6 @@ def tail_f(file_path, seen_ips_file):
     finally:
         process.terminate()
         process.wait()
-        save_seen_ips(seen_ips_file, seen_ips)  # Save seen IPs before exiting
 
 
 def log_parser(log_file_path):
@@ -208,8 +189,7 @@ if __name__ == "__main__":
         logger.add(sys.stdout, level="INFO")
 
     if args.realtime:
-        seen_ips_file = "seen_ips.pkl"  # File to save the set of seen IPs
-        tail_f("/var/log/nginx/access.log", seen_ips_file)
+        tail_f("/var/log/nginx/access.log")
     else:
         if args.print:
             logs_df = log_parser("/var/log/nginx/access.log")
