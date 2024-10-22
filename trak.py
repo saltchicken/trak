@@ -133,7 +133,7 @@ def tail_f(file_path):
                         )
                     else:
                         # Add the IP to the set
-                        logger.debug(connection)
+                        logger.info(f"Running gps on {connection}")
                         latitude, longitude = get_coordinates(connection.ip)
                         if latitude and longitude:
                             sql_cursor.insert_connection(
@@ -169,6 +169,17 @@ def log_parser(log_file_path):
     return logs_df
 
 
+def insert_into_table(logs_df):
+    for ip in logs_df["ip"].unique():
+        if sql_cursor.check_if_ip_exists(ip):
+            logger.info(f"Record already exists for {ip}")
+        else:
+            logger.info(f"Running GPS on {ip}")
+            latitude, longitude = get_coordinates(ip)
+            if latitude and longitude:
+                sql_cursor.insert_connection(ip, latitude, longitude)
+
+
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser(
         description="Process log files from nginx access log"
@@ -181,6 +192,9 @@ if __name__ == "__main__":
     )
     arg_parser.add_argument("--code", help="Specific status_code")
     arg_parser.add_argument("--debug", action="store_true", help="Print debug messages")
+    arg_parser.add_argument(
+        "--update_db", action="store_true", help="This will parse log and update DB"
+    )
 
     args = arg_parser.parse_args()
 
@@ -190,6 +204,11 @@ if __name__ == "__main__":
 
     if args.realtime:
         tail_f("/var/log/nginx/access.log")
+
+    elif args.update_db:
+        logs_df = log_parser("/var/log/nginx/access.log")
+        insert_into_table(logs_df)
+
     else:
         if args.print:
             logs_df = log_parser("/var/log/nginx/access.log")
