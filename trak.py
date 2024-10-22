@@ -1,4 +1,5 @@
 import subprocess
+import time
 import re
 import pickle
 import os
@@ -176,6 +177,7 @@ def insert_into_table(logs_df):
         else:
             logger.info(f"Running GPS on {ip}")
             latitude, longitude = get_coordinates(ip)
+            time.sleep(0.5)
             if latitude and longitude:
                 sql_cursor.insert_connection(ip, latitude, longitude)
 
