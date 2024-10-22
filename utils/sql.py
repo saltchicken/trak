@@ -34,7 +34,7 @@ class SQL_Cursor:
 
     def check_if_ip_exists(self, ip):
         if check_if_ip_is_LAN(ip):
-            print("Coming from home, skipping")
+            print(f"Coming from home, skipping: {ip}")
             return True
         query = f"""
         SELECT ip FROM {os.getenv("CONNECTIONS_TABLE")} WHERE ip = '{ip}'
@@ -43,10 +43,8 @@ class SQL_Cursor:
             self.cursor.execute(query)
             records = self.cursor.fetchall()
             if len(records):
-                print("ip exists")
                 return True
             else:
-                print("ip doesn't exist")
                 return False
         except Exception as e:
             print(f"Error during check: {e}")
