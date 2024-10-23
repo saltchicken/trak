@@ -22,7 +22,6 @@ class Connection:
     response_size: str
     referrer: str
     user_agent: str
-    request: str = ""
 
     def __str__(self):
         return f"""
@@ -34,7 +33,6 @@ class Connection:
         Response Size: {self.response_size}
         Referrer: {self.referrer}
         User Agent: {self.user_agent}
-        Request: {self.request}
         """
 
 
@@ -85,13 +83,12 @@ def parse_line(line):
         if match:
             ip = match.group("ip")
             timestamp = match.group("timestamp")
-            method = ""
+            method = match.group("request")
             url = ""
             status_code = ""
             response_size = match.group("response_size")
             referrer = match.group("referrer")
             user_agent = match.group("user_agent")
-            request = match.group("request")
             connection = Connection(
                 ip,
                 timestamp,
@@ -101,7 +98,6 @@ def parse_line(line):
                 response_size,
                 referrer,
                 user_agent,
-                request,
             )
             return connection
         else:
