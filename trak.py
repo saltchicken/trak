@@ -10,18 +10,20 @@ import pandas as pd
 from utils import SQL_Cursor
 
 from dataclasses import dataclass, asdict
+from typing import Optional
 
 
 @dataclass
 class Connection:
     ip: str
     timestamp: str
-    method: str
-    url: str
-    status_code: str
+    method: Optional[str]
+    url: Optional[str]
+    status_code: Optional[str]
     response_size: str
     referrer: str
     user_agent: str
+    payload: Optional[str]
 
     def __str__(self):
         return f"""
@@ -33,6 +35,7 @@ class Connection:
         Response Size: {self.response_size}
         Referrer: {self.referrer}
         User Agent: {self.user_agent}
+        Payload: {self.payload}
         """
 
 
@@ -71,8 +74,17 @@ def parse_line(line):
         response_size = match.group("response_size")
         referrer = match.group("referrer")
         user_agent = match.group("user_agent")
+        payload = None
         connection = Connection(
-            ip, timestamp, method, url, status_code, response_size, referrer, user_agent
+            ip,
+            timestamp,
+            method,
+            url,
+            status_code,
+            response_size,
+            referrer,
+            user_agent,
+            payload,
         )
         return connection
     else:
@@ -83,12 +95,13 @@ def parse_line(line):
         if match:
             ip = match.group("ip")
             timestamp = match.group("timestamp")
-            method = match.group("request")
-            url = ""
-            status_code = ""
+            method = None
+            url = None
+            status_code = None
             response_size = match.group("response_size")
             referrer = match.group("referrer")
             user_agent = match.group("user_agent")
+            payload = match.group("request")
             connection = Connection(
                 ip,
                 timestamp,
@@ -98,6 +111,7 @@ def parse_line(line):
                 response_size,
                 referrer,
                 user_agent,
+                payload,
             )
             return connection
         else:
