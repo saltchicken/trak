@@ -170,6 +170,14 @@ def log_parser(log_file_path):
     return logs_df
 
 
+# trak_dev.log_messages
+
+
+def insert_log_message_into_table(logs_df):
+    for connection in logs_df:
+        print(connection)
+
+
 def insert_into_table(logs_df):
     for ip in logs_df["ip"].unique():
         if sql_cursor.check_if_ip_exists(ip):
@@ -198,6 +206,9 @@ if __name__ == "__main__":
         "--update_db", action="store_true", help="This will parse log and update DB"
     )
 
+    arg_parser.add_argument(
+        "--update_logs", action="store_true", help="This will parse log and update DB"
+    )
     args = arg_parser.parse_args()
 
     if not args.debug:
@@ -210,6 +221,10 @@ if __name__ == "__main__":
     elif args.update_db:
         logs_df = log_parser("/var/log/nginx/access.log")
         insert_into_table(logs_df)
+
+    elif args.update_logs:
+        logs_df = log_parser("/var/log/nginx/access.log")
+        insert_log_message_into_table(logs_df)
 
     else:
         if args.print:
