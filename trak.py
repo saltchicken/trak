@@ -175,7 +175,7 @@ def log_parser(log_file_path):
 
 def insert_log_message_into_table(logs_df):
     for index, connection in logs_df.iterrows():
-        print(connection)
+        print(connection.ip)
 
 
 def insert_into_table(logs_df):
