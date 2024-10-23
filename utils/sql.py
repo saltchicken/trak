@@ -75,7 +75,7 @@ class SQL_Cursor:
         user_agent,
     ):
         query = f"""
-        INSERT INTO {os.getenv("LOG_MESSAGES_TABLE")} (ip, latitude, longitude) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO {os.getenv("LOG_MESSAGES_TABLE")} (ip, timestamp, method, url, status_code, response_size, referrer, user_agent) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         data_to_insert = (
             ip,
