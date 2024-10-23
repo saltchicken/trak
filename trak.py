@@ -171,7 +171,16 @@ def log_parser(log_file_path):
 
 def insert_log_message_into_table(logs_df):
     for index, connection in logs_df.iterrows():
-        print(connection.ip)
+        sql_cursor.insert_log(
+            connection.ip,
+            connection.timestamp,
+            connection.method,
+            connection.url,
+            connection.status_code,
+            connection.response_size,
+            connection.referrer,
+            connection.user_agent,
+        )
 
 
 def insert_into_table(logs_df):
