@@ -63,6 +63,39 @@ class SQL_Cursor:
         except Exception as e:
             print(f"Error during retrieval: {e}")
 
+    def insert_log(
+        self,
+        ip,
+        timestamp,
+        method,
+        url,
+        status_code,
+        response_size,
+        referrer,
+        user_agent,
+    ):
+        query = f"""
+        INSERT INTO {os.getenv("LOG_MESSAGES_TABLE")} (ip, latitude, longitude) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        data_to_insert = (
+            ip,
+            timestamp,
+            method,
+            url,
+            status_code,
+            response_size,
+            referrer,
+            user_agent,
+        )
+
+        try:
+            self.cursor.execute(query, data_to_insert)
+            self.connection.commit()
+            print("Record inserted successfully")
+        except Exception as e:
+            print(f"Error: {e}")
+            self.connection.rollback()
+
     def insert_connection(self, ip, latitude, longitude):
         query = f"""
         INSERT INTO {os.getenv("CONNECTIONS_TABLE")} (ip, latitude, longitude) VALUES (%s, %s, %s)
