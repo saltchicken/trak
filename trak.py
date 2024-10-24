@@ -113,8 +113,7 @@ def parse_line(line):
             referrer = match.group("referrer")
             user_agent = match.group("user_agent")
             payload = match.group("request")
-            if isinstance(payload, bytes):
-                print("true")
+            print(type(payload))
             connection = Connection(
                 ip,
                 remote_user,
