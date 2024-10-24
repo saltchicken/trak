@@ -16,7 +16,7 @@ from typing import Optional
 @dataclass
 class Connection:
     ip: str
-    remote_user: str
+    remote_user: Optional[str]
     timestamp: str
     method: Optional[str]
     url: Optional[str]
@@ -69,7 +69,9 @@ def parse_line(line):
     match = valid_request_log_pattern.search(line)
     if match:
         ip = match.group("ip")
-        remote_user = match.group("remote_user")
+        remote_user = (
+            None if match.group("remote_user") == "-" else match.group("remote_user")
+        )
         timestamp = match.group("timestamp")
         method = match.group("method")
         url = match.group("url")
@@ -98,7 +100,11 @@ def parse_line(line):
         match = invalid_request_log_pattern.search(line)
         if match:
             ip = match.group("ip")
-            remote_user = match.group("remote_user")
+            remote_user = (
+                None
+                if match.group("remote_user") == "-"
+                else match.group("remote_user")
+            )
             timestamp = match.group("timestamp")
             method = None
             url = None
