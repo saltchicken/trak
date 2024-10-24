@@ -172,10 +172,13 @@ def tail_f(file_path):
         process.wait()
 
 
-def log_parser(log_file_path):
+def log_parser(log_file_path, append=False):
     log_file = log_file_path
     failed_lines = []
-    current_line = sql_cursor.query_size_of_log_messages_table()
+    if append:
+        current_line = sql_cursor.query_size_of_log_messages_table()
+    else:
+        current_line = 0
     print(f"Log file at line {current_line}")
 
     with open(log_file, "r") as f:
@@ -261,7 +264,7 @@ if __name__ == "__main__":
         insert_into_table(logs_df)
 
     elif args.update_logs:
-        logs_df = log_parser("/var/log/nginx/access.log")
+        logs_df = log_parser("/var/log/nginx/access.log", append=True)
         insert_log_message_into_table(logs_df)
 
     else:
