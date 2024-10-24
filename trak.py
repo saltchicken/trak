@@ -172,14 +172,16 @@ def tail_f(file_path):
         process.wait()
 
 
-def log_parser(log_file_path, line_number_start=0):
+def log_parser(log_file_path):
     log_file = log_file_path
     failed_lines = []
+    current_line = sql_cursor.query_size_of_log_messages_table()
+    print(f"Log file at line {current_line}")
 
     with open(log_file, "r") as f:
         log_entries = []
         for line_number, line in enumerate(f):
-            if line_number < line_number_start:
+            if line_number < current_line:
                 continue
             connection = parse_line(line)
             if connection:
@@ -199,20 +201,19 @@ def log_parser(log_file_path, line_number_start=0):
 
 
 def insert_log_message_into_table(logs_df):
-    print(sql_cursor.query_size_of_log_messages_table())
-    # for index, connection in logs_df.iterrows():
-    #     sql_cursor.insert_log(
-    #         connection.ip,
-    #         connection.remote_user,
-    #         connection.timestamp,
-    #         connection.method,
-    #         connection.url,
-    #         connection.status_code,
-    #         connection.response_size,
-    #         connection.referrer,
-    #         connection.user_agent,
-    #         connection.payload,
-    #     )
+    for index, connection in logs_df.iterrows():
+        sql_cursor.insert_log(
+            connection.ip,
+            connection.remote_user,
+            connection.timestamp,
+            connection.method,
+            connection.url,
+            connection.status_code,
+            connection.response_size,
+            connection.referrer,
+            connection.user_agent,
+            connection.payload,
+        )
 
 
 def insert_into_table(logs_df):
