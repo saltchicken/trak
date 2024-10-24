@@ -98,6 +98,7 @@ def parse_line(line):
         match = invalid_request_log_pattern.search(line)
         if match:
             ip = match.group("ip")
+            remote_user = match.group("remote_user")
             timestamp = match.group("timestamp")
             method = None
             url = None
@@ -108,6 +109,7 @@ def parse_line(line):
             payload = match.group("request")
             connection = Connection(
                 ip,
+                remote_user,
                 timestamp,
                 method,
                 url,
@@ -191,6 +193,7 @@ def insert_log_message_into_table(logs_df):
     for index, connection in logs_df.iterrows():
         sql_cursor.insert_log(
             connection.ip,
+            connection.remote_user,
             connection.timestamp,
             connection.method,
             connection.url,
@@ -198,6 +201,7 @@ def insert_log_message_into_table(logs_df):
             connection.response_size,
             connection.referrer,
             connection.user_agent,
+            connection.payload,
         )
 
 
