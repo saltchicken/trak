@@ -112,8 +112,8 @@ def parse_line(line):
             response_size = match.group("response_size")
             referrer = match.group("referrer")
             user_agent = match.group("user_agent")
-            payload = match.group("request")
-            print(type(payload))
+            payload = "test"
+            # payload = repr(payload.decode("lati1"))
             connection = Connection(
                 ip,
                 remote_user,
