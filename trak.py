@@ -57,10 +57,10 @@ def get_coordinates(ip):
 
 
 valid_request_log_pattern = re.compile(
-    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - (?P<remote_user>[A-Z-]+) \[(?P<timestamp>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
+    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - (?P<remote_user>[A-Za-z-]+) \[(?P<timestamp>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
 )
 invalid_request_log_pattern = re.compile(
-    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - (?P<remote_user>[A-Z-]+) \[(?P<timestamp>[^\]]+)\] "(?P<request>[^"]*)" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]*)" "(?P<user_agent>[^"]*)"'
+    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - (?P<remote_user>[A-Za-z-]+) \[(?P<timestamp>[^\]]+)\] "(?P<request>[^"]*)" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]*)" "(?P<user_agent>[^"]*)"'
 )
 
 
