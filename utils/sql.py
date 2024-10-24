@@ -95,7 +95,6 @@ class SQL_Cursor:
         try:
             self.cursor.execute(query, data_to_insert)
             self.connection.commit()
-            print("Record inserted successfully")
         except Exception as e:
             print(f"Error: {e}")
             self.connection.rollback()
