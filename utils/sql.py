@@ -56,7 +56,7 @@ class SQL_Cursor:
         try:
             self.cursor.execute(query)
             records = self.cursor.fetchall()
-            return records[0]
+            return records[0][0]
         except Exception as e:
             print(f"Error during retrieval: {e}")
             return None
