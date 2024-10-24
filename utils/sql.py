@@ -66,6 +66,7 @@ class SQL_Cursor:
     def insert_log(
         self,
         ip,
+        remote_user,
         timestamp,
         method,
         url,
@@ -73,12 +74,14 @@ class SQL_Cursor:
         response_size,
         referrer,
         user_agent,
+        payload,
     ):
         query = f"""
-        INSERT INTO {os.getenv("LOG_MESSAGES_TABLE")} (ip, timestamp, method, url, status_code, response_size, referrer, user_agent) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO {os.getenv("LOG_MESSAGES_TABLE")} (ip, remote_user, timestamp, method, url, status_code, response_size, referrer, user_agent, payload) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         data_to_insert = (
             ip,
+            remote_user,
             timestamp,
             method,
             url,
@@ -86,6 +89,7 @@ class SQL_Cursor:
             response_size,
             referrer,
             user_agent,
+            payload,
         )
 
         try:

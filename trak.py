@@ -16,6 +16,7 @@ from typing import Optional
 @dataclass
 class Connection:
     ip: str
+    remote_user: str
     timestamp: str
     method: Optional[str]
     url: Optional[str]
@@ -28,6 +29,7 @@ class Connection:
     def __str__(self):
         return f"""
         New IP: {self.ip}
+        remote_user: {self.remote_user}
         Timestamp: {self.timestamp}
         Method: {self.method}
         URL: {self.url}
@@ -55,10 +57,10 @@ def get_coordinates(ip):
 
 
 valid_request_log_pattern = re.compile(
-    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
+    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - (?P<remote_user>[A-Z-]+) \[(?P<timestamp>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
 )
 invalid_request_log_pattern = re.compile(
-    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<timestamp>[^\]]+)\] "(?P<request>[^"]*)" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]*)" "(?P<user_agent>[^"]*)"'
+    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - (?P<remote_user>[A-Z-]+) \[(?P<timestamp>[^\]]+)\] "(?P<request>[^"]*)" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]*)" "(?P<user_agent>[^"]*)"'
 )
 
 
@@ -67,6 +69,7 @@ def parse_line(line):
     match = valid_request_log_pattern.search(line)
     if match:
         ip = match.group("ip")
+        remote_user = match.group("remote_user")
         timestamp = match.group("timestamp")
         method = match.group("method")
         url = match.group("url")
@@ -77,6 +80,7 @@ def parse_line(line):
         payload = None
         connection = Connection(
             ip,
+            remote_user,
             timestamp,
             method,
             url,
