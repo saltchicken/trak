@@ -172,13 +172,15 @@ def tail_f(file_path):
         process.wait()
 
 
-def log_parser(log_file_path):
+def log_parser(log_file_path, line_number_start=0):
     log_file = log_file_path
     failed_lines = []
 
     with open(log_file, "r") as f:
         log_entries = []
-        for line in f:
+        for line_number, line in enumerate(f):
+            if line_number < line_number_start:
+                continue
             connection = parse_line(line)
             if connection:
                 log_entries.append(asdict(connection))
