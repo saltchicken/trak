@@ -1,16 +1,21 @@
 import subprocess
 import time
 import re
-import pickle
-import os
 import sys
 import argparse
+from datetime import datetime
 from loguru import logger
 import pandas as pd
 from utils import SQL_Cursor
 
 from dataclasses import dataclass, asdict
 from typing import Optional
+
+
+def date_string_to_timestamp(date_string: str):
+    return datetime.strptime(date_string, "%d/%b/%Y:%H:%M:%S %z").strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
 
 
 @dataclass
@@ -72,7 +77,7 @@ def parse_line(line):
         remote_user = (
             None if match.group("remote_user") == "-" else match.group("remote_user")
         )
-        timestamp = match.group("timestamp")
+        timestamp = date_string_to_timestamp(match.group("timestamp"))
         method = match.group("method")
         url = match.group("url")
         status_code = match.group("status_code")
@@ -105,7 +110,7 @@ def parse_line(line):
                 if match.group("remote_user") == "-"
                 else match.group("remote_user")
             )
-            timestamp = match.group("timestamp")
+            timestamp = date_string_to_timestamp(match.group("timestamp"))
             method = None
             url = None
             status_code = None
