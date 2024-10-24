@@ -49,6 +49,18 @@ class SQL_Cursor:
         except Exception as e:
             print(f"Error during check: {e}")
 
+    def query_size_of_log_messages_table(self):
+        query = """
+        SELECT COUNT(*) FROM {os.getenv("LOG_MESSAGES_TABLE")}
+        """
+        try:
+            self.cursor.execute(query)
+            records = self.cursor.fetchall()
+            return records[0]
+        except Exception as e:
+            print(f"Error during retrieval: {e}")
+            return None
+
     def run_query(self):
         query = f"""
         SELECT * FROM {os.getenv("CONNECTIONS_TABLE")}
