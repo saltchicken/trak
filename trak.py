@@ -60,7 +60,7 @@ valid_request_log_pattern = re.compile(
     r'(?P<ip>\d+\.\d+\.\d+\.\d+) - (?P<remote_user>[A-Za-z-]+) \[(?P<timestamp>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>[^"]+) HTTP/\d\.\d" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]+)" "(?P<user_agent>[^"]+)"'
 )
 invalid_request_log_pattern = re.compile(
-    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - (?P<remote_user>[A-Za-z-]+) \[(?P<timestamp>[^\]]+)\] "(?P<request>[^"]*)" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]*)" "(?P<user_agent>[^"]*)"'
+    r'(?P<ip>\d+\.\d+\.\d+\.\d+) - (?P<remote_user>[A-Za-z-]+) \[(?P<timestamp>[^\]]+)\] "(?P<payload>[^"]*)" (?P<status_code>\d+) (?P<response_size>\d+) "(?P<referrer>[^"]*)" "(?P<user_agent>[^"]*)"'
 )
 
 
@@ -112,7 +112,7 @@ def parse_line(line):
             response_size = match.group("response_size")
             referrer = match.group("referrer")
             user_agent = match.group("user_agent")
-            payload = "test"
+            payload = match.group("payload")
             # payload = repr(payload.decode("lati1"))
             connection = Connection(
                 ip,
