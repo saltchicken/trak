@@ -50,7 +50,7 @@ class SQL_Cursor:
             print(f"Error during check: {e}")
 
     def query_size_of_log_messages_table(self):
-        query = """
+        query = f"""
         SELECT COUNT(*) FROM {os.getenv("LOG_MESSAGES_TABLE")}
         """
         try:
