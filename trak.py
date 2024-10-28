@@ -226,7 +226,8 @@ def insert_log_message_into_table(logs_df):
 
 def insert_into_table(logs_df, append=False):
     if append:
-        current_line = sql_cursor.query_size_of_log_messages_table()
+        print("ignore")
+        # current_line = sql_cursor.query_size_of_log_messages_table()
     else:
         current_line = 0
     for line_number, ip in enumerate(logs_df["ip"].unique()):
@@ -271,7 +272,7 @@ if __name__ == "__main__":
         tail_f("/var/log/nginx/access.log")
 
     elif args.update_db:
-        logs_df = log_parser("/var/log/nginx/access.log")
+        logs_df = log_parser("/var/log/nginx/access.log", append=True)
         insert_into_table(logs_df)
 
     elif args.update_logs:
