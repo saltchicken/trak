@@ -229,7 +229,7 @@ def insert_into_table(logs_df, append=False):
         current_line = sql_cursor.query_size_of_log_messages_table()
     else:
         current_line = 0
-    print(log_df["ip"].unique())
+    print(logs_df["ip"].unique())
     for ip in logs_df["ip"].unique():
         if sql_cursor.check_if_ip_exists(ip):
             print(f"Record already exists for {ip}")
