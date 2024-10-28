@@ -230,6 +230,8 @@ def insert_into_table(logs_df, append=False):
     else:
         current_line = 0
     for line_number, ip in enumerate(logs_df["ip"].unique()):
+        if line_number < current_line:
+            continue
         if sql_cursor.check_if_ip_exists(ip):
             print(f"Record already exists for {ip}")
         else:
