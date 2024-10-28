@@ -227,7 +227,7 @@ def insert_log_message_into_table(logs_df):
 def insert_into_table(logs_df):
     for ip in logs_df["ip"].unique():
         if sql_cursor.check_if_ip_exists(ip):
-            logger.info(f"Record already exists for {ip}")
+            logger.debug(f"Record already exists for {ip}")
         else:
             logger.info(f"Running GPS on {ip}")
             latitude, longitude = get_coordinates(ip)
