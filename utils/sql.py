@@ -1,6 +1,7 @@
 import psycopg2
 import os
 from dotenv import load_dotenv
+from loguru import logger
 import ipaddress
 
 
@@ -34,7 +35,7 @@ class SQL_Cursor:
 
     def check_if_ip_exists(self, ip):
         if check_if_ip_is_LAN(ip):
-            print(f"Coming from home, skipping: {ip}")
+            logger.debug(f"Coming from home, skipping: {ip}")
             return True
         query = f"""
         SELECT ip FROM {os.getenv("CONNECTIONS_TABLE")} WHERE ip = '{ip}'
@@ -120,7 +121,7 @@ class SQL_Cursor:
         try:
             self.cursor.execute(query, data_to_insert)
             self.connection.commit()
-            print("Record inserted successfully")
+            logger.info("Record inserted successfully")
         except Exception as e:
             print(f"Error: {e}")
             self.connection.rollback()
