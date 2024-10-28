@@ -272,7 +272,7 @@ if __name__ == "__main__":
         tail_f("/var/log/nginx/access.log")
 
     elif args.update_db:
-        logs_df = log_parser("/var/log/nginx/access.log", append=True)
+        logs_df = log_parser("/var/log/nginx/access.log", append=False)
         insert_into_table(logs_df)
 
     elif args.update_logs:
