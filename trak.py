@@ -224,7 +224,11 @@ def insert_log_message_into_table(logs_df):
         )
 
 
-def insert_into_table(logs_df):
+def insert_into_table(logs_df, append=False):
+    if append:
+        print("append")
+    else:
+        print("no appaend")
     for ip in logs_df["ip"].unique():
         if sql_cursor.check_if_ip_exists(ip):
             logger.debug(f"Record already exists for {ip}")
