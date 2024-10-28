@@ -229,7 +229,8 @@ def insert_into_table(logs_df, append=False):
         current_line = sql_cursor.query_size_of_log_messages_table()
     else:
         current_line = 0
-    for line_number, ip in enumerate(logs_df["ip"].unique()):
+    unique_ips = logs_df["ip"].unique()
+    for line_number, ip in enumerate(unique_ips):
         if line_number < current_line:
             continue
 
